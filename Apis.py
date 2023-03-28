@@ -71,7 +71,7 @@ def eliminar_usuario(id):
                 "status": 200
             }
             return jsonify(respuesta)
-      respuesta_negativa={
+     respuesta_negativa={
         "msg": "No se encontró el usuario, por favor verifique el ID",
         "status": 404
     }
