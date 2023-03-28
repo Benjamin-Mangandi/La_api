@@ -8,7 +8,6 @@ CORS(app)
 #ARREGLOS
 
 usuarios = []
-stikers = []
 
 #USUARIOS
 
@@ -24,24 +23,6 @@ def ver_usuario(id):
     }
     return jsonify(respuesta_negativa)
 
-#INICIAR SESION
-@app.route('/user/login', methods=['POST'])
-def logearse():
-    datos_de_usuario = request.get_json(True)
-    for usuario in usuarios:
-        if datos_de_usuario["user_nickname"]==usuario["user_nickname"] and datos_de_usuario["user_password"]== usuario["user_password"]:
-            return {
-                "msg": "Sesión iniciada, Bienvenido",
-                "autorizado":True,
-                "status": 200,
-                "id_user": usuario["id_user"]
-            }
-    return{
-        "msg": "Datos Incorrectos, por favor verifique sus datos",
-        "autorizado": False,
-        "status": 404
-    }
-
 #ACTUALIZAR USUARIO
 @app.route('/user/<id>', methods=['PUT'])
 def modificar_usuario(id):
@@ -49,9 +30,7 @@ def modificar_usuario(id):
         if usuario["id_user"]==id:
             body_usuario= request.get_json(True)
             usuario["user_name"] = body_usuario.get("user_name")
-            usuario["user_nickname"] = body_usuario.get("user_nickname")
-            usuario["user_password"] = body_usuario.get("user_password")
-            usuario["user_stikers"] = body_usuario.get("user_stikers")
+            usuario["user_password"] = body_usuario.get("user_password") 
             respuesta={
                 "msg": "Usuario modificado con exito!",
                 "status": 200
@@ -81,6 +60,22 @@ def crear_usuario():
     }
     return jsonify(respuesta)
 
+#ELIMINAR USUARIO
+@app.route('/user/<id>', methods=["DELETE"])
+def eliminar_usuario(id):
+    for usuario in usuarios:
+        if usuario["id_user"]==id:
+            usuarios.remove(usuario)
+            respuesta={
+                "msg": "Usuario eliminado con exito!",
+                "status": 200
+            }
+            return jsonify(respuesta)
+      respuesta_negativa={
+        "msg": "No se encontró el usuario, por favor verifique el ID",
+        "status": 404
+    }
+    return jsonify(respuesta_negativa)  
 
 #INICIAR
 if __name__ == ('__main__'):
