@@ -3,21 +3,23 @@ from flask_cors import CORS
 import mysql.connector
 from mysql.connector import Error
 
+
 app = Flask(__name__)
 CORS(app)
 
 #ARREGLOS
+
 usuarios = []
 
-#BASE DE DATOS
+
 connection = None
 
 try:
     connection = mysql.connector.connect(
         host='localhost',
         port=3306,
-        database='mysql_docker',
-        user='root@localhost',
+        database='Prueba',
+        user='root',
         password='practicas'
     )
 
@@ -25,9 +27,10 @@ try:
         db_info = connection.get_server_info()
         print(f"Conectado a la base de datos MySQL {db_info}")
         cursor = connection.cursor()
-        cursor.execute("SELECT DATABASE();")
-        record = cursor.fetchone()
-        print(f"Base de datos en uso: {record}")
+        cursor.execute("SELECT * FROM No")
+        resultado=cursor.fetchall()
+        for row in resultado:
+            print(row)
 
 except Error as e:
     print(f"Error al conectarse a la base de datos: {e}")
@@ -44,7 +47,7 @@ finally:
 @app.route('/user/<id>', methods=['GET'])
 def ver_usuario(id):
     for usuario in usuarios:
-        if usuario["id_user"]==id:
+        if usuario["ID"]==id:
             return jsonify(usuario)
     respuesta_negativa={
         "msg": "No se encontró el usuario, por favor verifique el ID",
@@ -56,10 +59,10 @@ def ver_usuario(id):
 @app.route('/user/<id>', methods=['PUT'])
 def modificar_usuario(id):
     for usuario in usuarios:
-        if usuario["id_user"]==id:
+        if usuario["ID"]==id:
             body_usuario= request.get_json(True)
-            usuario["user_name"] = body_usuario.get("user_name")
-            usuario["user_password"] = body_usuario.get("user_password") 
+            usuario["nombre"] = body_usuario.get("nombre")
+            usuario["carnet"] = body_usuario.get("carnet") 
             respuesta={
                 "msg": "Usuario modificado con exito!",
                 "status": 200
@@ -76,7 +79,7 @@ def modificar_usuario(id):
 def crear_usuario():
     nuevo_usuario = request.get_json(True)
     for usuario in usuarios:
-        if usuario["id_user"] == nuevo_usuario.get("id_user"):
+        if usuario["ID"] == nuevo_usuario.get("ID"):
             respuesta_negativa={
                 "msg": "Un usuario ya existe con ese ID",
                 "status": 400
@@ -93,7 +96,7 @@ def crear_usuario():
 @app.route('/user/<id>', methods=["DELETE"])
 def eliminar_usuario(id):
     for usuario in usuarios:
-        if usuario["id_user"]==id:
+        if usuario["ID"]==id:
             usuarios.remove(usuario)
             respuesta={
                 "msg": "Usuario eliminado con exito!",
